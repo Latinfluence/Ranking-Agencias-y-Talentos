@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agencias y Talentos 2025 vs 2026 · Dashboard comercial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f6f5f2; --surface:#fcfcfb; --border:#e4e2dc; --grid:#ecebe6;
+  --text-1:#0b0b0b; --text-2:#52514e; --text-3:#7d7c77;
+  --s26:#2a78d6; --s25:#b9b7b0;
+  --up:#2a78d6; --down:#e34948; --new:#1baf7a;
+  --good:#0a7d0a; --bad:#c23434; --warn-bg:#fff6e0; --warn-bd:#f0d48a;
+  --chip:#efeee9;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --bg:#121211; --surface:#1a1a19; --border:#2e2e2b; --grid:#262624;
+    --text-1:#f0efec; --text-2:#c3c2b7; --text-3:#8f8e86;
+    --s26:#3987e5; --s25:#5a5955;
+    --up:#3987e5; --down:#e66767; --new:#199e70;
+    --good:#3fbf3f; --bad:#ef7a7a; --warn-bg:#2b2410; --warn-bd:#5b4a1a;
+    --chip:#262624;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text-1);font:14px/1.45 Inter,system-ui,sans-serif;}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 24px 48px}
+h1{font-size:22px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--text-2);margin:0 0 14px}
+.note{background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 12px;color:var(--text-2);font-size:12.5px;margin-bottom:16px}
+.topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid var(--border)}
+.tabs{display:flex;gap:4px}
+.tabs a{padding:10px 14px;color:var(--text-2);text-decoration:none;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a.on{color:var(--text-1);border-color:var(--s26);font-weight:600}
+.basesel{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);padding-bottom:8px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.seg{display:inline-flex;background:var(--chip);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--text-1);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg button small{color:var(--text-3);margin-left:4px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--s26);width:16px;height:16px}
+input[type=search]{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-1);min-width:200px}
+.spacer{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi .lbl{font-size:12px;color:var(--text-2);margin-bottom:6px}
+.kpi .val{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.kpi .det{font-size:12px;color:var(--text-3);margin-top:4px}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid32{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+@media (max-width:900px){.grid2,.grid32{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;min-width:0}
+.card h2{font-size:15px;margin:0 0 2px;font-weight:600}
+.card .cap{font-size:12.5px;color:var(--text-2);margin:0 0 12px}
+.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--text-2);margin-bottom:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ln{height:2px;width:14px;vertical-align:3px}
+svg{display:block}
+svg text{font-family:Inter,system-ui,sans-serif}
+.lab{fill:var(--text-1);font-size:12px}
+.lab2{fill:var(--text-2);font-size:11px}
+.ax{fill:var(--text-3);font-size:11px}
+.hit{fill:transparent}
+.hit:hover{fill:rgba(127,127,127,.08)}
+#tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.14);opacity:0;transition:opacity .08s;z-index:10;min-width:210px}
+#tip b{display:block;font-size:13px;margin-bottom:4px}
+#tip .r{display:flex;justify-content:space-between;gap:16px;color:var(--text-2)}
+#tip .r span:last-child{color:var(--text-1);font-variant-numeric:tabular-nums}
+.insights{margin:0;padding-left:18px}
+.insights li{margin-bottom:8px}
+.insights li span{color:var(--text-2)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{text-align:right;font-weight:600;color:var(--text-2);padding:8px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none}
+th:first-child,td:first-child{text-align:left}
+th.sorted::after{content:" ▾"} th.sorted.asc::after{content:" ▴"}
+td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--grid);white-space:nowrap}
+td small{color:var(--text-3);margin-left:6px}
+tr:hover td{background:rgba(127,127,127,.05)}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.b-up{background:rgba(42,120,214,.14);color:var(--up)}
+.b-down{background:rgba(227,73,72,.13);color:var(--down)}
+.b-new{background:rgba(27,175,122,.15);color:var(--new)}
+.b-lost{background:var(--chip);color:var(--text-2)}
+.tablewrap{overflow-x:auto}
+.foot{font-size:11.5px;color:var(--text-3);margin-top:14px}
+.view{display:none}.view.on{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Agencias y Talentos · 2025 vs 2026</h1>
+  <p class="sub">Negocios ganados por Close Date · valores en ARS equivalentes (USD convertido al promedio mensual BNA oficial vendedor) · 2026 hasta el 17/11</p>
+
+  <div class="topbar">
+    <nav class="tabs" id="tabs">
+      <a href="#resumen" data-v="resumen">Resumen</a>
+      <a href="#agencias" data-v="agencias">Agencias</a>
+      <a href="#talentos" data-v="talentos">Talentos</a>
+    </nav>
+    <div class="basesel">Comparar 2026 contra
+      <div class="seg" id="baseSel">
+        <button data-b="full" class="on">2025 completo</button>
+        <button data-b="ytd">2025 al 17/11</button>
+      </div>
+    </div>
+  </div>
+  <div class="note" id="baseNote"></div>
+
+  <!-- RESUMEN -->
+  <section class="view" id="v-resumen">
+    <div class="kpis" id="r-kpis"></div>
+    <div class="grid32">
+      <div class="card">
+        <div class="cardhead"><div><h2>Venta ganada por mes</h2><p class="cap">2026 hasta el 17/11. Pasá el mouse para ver cada mes.</p></div>
+          <div class="seg" id="monMode"><button data-m="m" class="on">Mensual</button><button data-m="c">Acumulado</button></div></div>
+        <div class="legend"><span><i class="ln" style="background:var(--s25)"></i>2025</span><span><i class="ln" style="background:var(--s26)"></i>2026</span></div>
+        <svg id="r-mon" width="100%" height="280"></svg>
+      </div>
+      <div class="card">
+        <h2>Lectura rápida</h2>
+        <p class="cap">Total compañía, todos los clientes y talentos.</p>
+        <ul class="insights" id="r-ins"></ul>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Top 20 clientes / agencias 2026</h2>
+      <p class="cap">Ordenado por venta 2026. En verde, clientes sin venta en la base 2025.</p>
+      <div class="legend"><span><i style="background:var(--s25)"></i><span class="lg25">2025</span></span><span><i style="background:var(--s26)"></i>2026 (al 17/11)</span><span><i style="background:var(--new)"></i>Cliente nuevo</span></div>
+      <svg id="r-cli" width="100%"></svg>
+    </div>
+  </section>
+
+  <!-- AGENCIAS / TALENTOS (same structure) -->
+  <section class="view" id="v-agencias"></section>
+  <section class="view" id="v-talentos"></section>
+
+  <p class="foot">Fuentes: planilla Top Agencias y Talentos 2025 vs 2026 (pestañas Comparativo y Agencias 10M) y export de deals del CRM. La base “2025 al 17/11” se calcula desde los deals con el mismo tipo de cambio mensual. Tasa de cierre = ganados ÷ (ganados + perdidos) por fecha de creación del deal.</p>
+</div>
+<div id="tip"></div>
+
+<script>
+const D={"ag": [["Influsales", 484304911, 36513350, 15, 14, 0, 42989911, 12], ["We are catch", 273959580, 251411124, 303, 196, 30380, 192830569, 262], ["Medialab", 173910027, 112440543, 80, 37, 0, 135206860, 65], ["WildFi", 148940000, 295578549, 45, 58, 5274, 126250000, 39], ["SamyRoad | A Samy Alliance Agency", 114535000, 260833862, 14, 95, 10700, 113475000, 13], ["GrowMaxValue", 69079990, 88515980, 31, 24, 59374, 50523635, 25], ["FLUVIP - The Martech Group", 51444431, 101002000, 18, 21, 0, 51444431, 18], ["NINCH", 49753423, 64155000, 16, 107, 0, 48690000, 14], ["MARCA DIRECTA", 46599150, 29200000, 34, 2, 0, 46599150, 34], ["Arcor", 46516265, 0, 19, 0, 0, 46516265, 19], ["Temu", 43182578, 9995800, 27, 3, 6600, 37296979, 26], ["Cabify", 35910000, 18052000, 21, 14, 0, 32910000, 20], ["Orishinal", 35088000, 29800000, 17, 12, 0, 27788000, 14], ["URBAN", 34805471, 21000000, 8, 2, 0, 30805471, 7], ["Somos Fans", 32300000, 89436200, 13, 41, 34450, 30250000, 11], ["Socialité", 31600000, 0, 6, 0, 0, 31600000, 5], ["love agency", 30300000, 36500000, 4, 3, 0, 30300000, 4], ["Bilbao group", 29890000, 36400000, 18, 18, 0, 29090000, 17], ["Jolie", 29205901, 0, 13, 0, 0, 23955901, 12], ["seekee", 25475940, 3421900, 23, 5, 2400, 14527210, 13], ["JAM", 21500000, 0, 3, 0, 0, 21500000, 3], ["Omint", 21400000, 1500000, 1, 1, 0, 0, 0], ["Digital Soul", 20203953, 12600000, 3, 2, 0, 20247949, 3], ["Be Influencers", 19040000, 1593207, 9, 1, 0, 19040000, 9], ["socialmate", 18000000, 0, 1, 0, 0, 18000000, 1], ["OMG", 17222800, 0, 4, 0, 0, 8289500, 2], ["Somos fuega", 15700000, 0, 5, 0, 0, 15700000, 5], ["Vermut", 15500000, 6500000, 10, 3, 0, 4000000, 2], ["DON", 14880000, 2500000, 7, 1, 0, 14280000, 6], ["Esenciabodyandhome", 13939200, 0, 6, 0, 0, 13939200, 6], ["Alurralde Jasper", 13640000, 0, 5, 0, 0, 13640000, 5], ["supra", 13141396, 9950000, 20, 7, 0, 11391388, 18], ["Huawei", 12937730, 14484000, 4, 3, 10200, 11741228, 3], ["Grail Agency", 11503339, 10004847, 8, 10, 6867, 11506384, 8], ["Cuatrocoronas", 10600000, 0, 3, 0, 0, 7600000, 2], ["another", 10115000, 0, 3, 0, 0, 10124690, 3]], "tal": [["Florencia Jazmín Peña | florjazminpe", 284529000, 283452800, 42, 25, 5000, 234645000, 34, 23, 81], ["Claudia Fontán | gundaok", 126625590, 176113058, 27, 33, 2143, 110038690, 24, 33, 63], ["Camila Ines Mayán Ruscitti | camimayan", 145708705, 160798256, 38, 32, 47366, 115433050, 31, 32, 144], ["Julieta Poggio | poggiojulieta", 130016000, 150634731, 28, 27, 10500, 95004940, 22, 27, 55], ["Pablo Emanuel Buenahora | pabloelpupi", 51671452, 115989607, 29, 27, 6500, 35578991, 23, 24, 47], ["Romina Andrea Juárez | juarezromi", 103328666, 91161179, 47, 34, 2943, 88343066, 43, 32, 83], ["Valentina Chait | valentinachait", 81685856, 69344112, 57, 27, 17777, 74208600, 53, 26, 100], ["Leandro Boggian | chacalboggian", 11637650, 63335200, 11, 15, 42600, 11058372, 9, 15, 40], ["Nicole Sabatino | nicolesabatiino", 60735020, 48390612, 40, 27, 16889, 29055753, 32, 27, 72], ["Julia Vasile | decopordosmangos", 24549500, 45164135, 12, 12, 15600, 21607477, 11, 12, 28], ["Leisla Nahir Gane | leislanahir.ok", 10676150, 42850486, 19, 18, 17483, 10277630, 18, 17, 45], ["Maximiliano Fontán | maxifontan", 21840740, 38595100, 22, 27, 16830, 20525738, 20, 27, 64], ["Solange Santander | solsantander", 20936900, 36690467, 18, 19, 5608, 19129041, 16, 16, 57], ["Nicolás Villafañe | losviajesdenicovilla", 24238258, 34820700, 16, 7, 22950, 24238255, 16, 7, 29], ["Lola Poggio | lolopoggio_", 18381000, 34250150, 6, 6, 2200, 16200000, 5, 6, 35], ["María Sol López Gaschetto | solgaschetto", 14123800, 32474700, 14, 11, 7350, 10423800, 12, 10, 43], ["Dario Orsi | darioorsi", 38823650, 28697000, 13, 4, 11000, 37223644, 12, 4, 32], ["Ernesto Raffo | ernestraffo", 0, 25682950, 0, 18, 485, 0, 0, 18, 56], ["Ezequiel Miere | zeta_mundo", 24471150, 25574300, 10, 11, 7300, 24471150, 10, 11, 39], ["Candelaria Zambrana | candezambrana", 6356700, 25188180, 10, 30, 3050, 1794000, 5, 30, 66], ["Tomás Arbillaga | robleis", 0, 24500000, 0, 1, 0, 0, 0, 1, 8], ["Pilar Cuevas | pilicuevass", 14737825, 16593300, 14, 12, 9200, 13502334, 12, 13, 37], ["Ignacio Lajud | nacho.lajud", 5786500, 14185500, 10, 16, 1680, 3231485, 6, 16, 36], ["Franco Colagrossi | arquerosinguantes", 2870400, 13806500, 4, 10, 4600, 2866122, 4, 10, 49], ["Macarena Giménez | makiamakinami", 0, 12984348, 1, 21, 1800, 0, 0, 20, 39], ["Florencia Alonso | florenciaaalonso", 0, 12875195, 0, 30, 1250, 0, 0, 30, 28], ["Jorge Pinarello | teloresumo", 0, 11800000, 0, 3, 8300, 0, 0, 3, 5], ["Xavier Mosqueira | xavimosqueira", 15792190, 9896486, 16, 10, 0, 15795463, 16, 10, 29], ["Paola Méndez Ortega | whospaolamendez", 1609200, 8564850, 1, 4, 5950, 1608516, 1, 4, 2], ["Lautaro Gonzalez | lautignzalez", 0, 8333233, 0, 23, 1400, 0, 0, 23, 30], ["Lara Hubscher | larahubsc", 3535200, 7639521, 3, 14, 2447, 3537682, 3, 14, 36], ["Ariana Cardozo | aricardozor", 6398750, 7610391, 13, 16, 2952, 5525205, 11, 16, 30], ["Malena Fernández de Luco | maledeluco", 0, 5400450, 1, 15, 2040, 0, 0, 15, 30], ["Franco Romero | francoromee", 24105600, 5134300, 9, 7, 1000, 7081200, 6, 7, 23], ["Carla Conte | negraconte", 0, 5000000, 0, 1, 0, 0, 0, 1, 6], ["Giselle García | gisellegl__", 710500, 4681600, 1, 2, 3300, 710495, 1, 2, 1], ["Martina Piccione | martiipiccione", 2200000, 4486133, 5, 8, 2150, 1200000, 3, 8, 25], ["Pilar Núñez | pilinunez_", 1317924, 4239692, 8, 8, 550, 1314601, 8, 8, 36], ["Loana Blanco | loliblancoo", 0, 4103550, 0, 11, 1150, 0, 0, 11, 21], ["Alejandro Wang | ale.wangg", 11167400, 3935670, 6, 2, 1300, 11161958, 5, 2, 25]], "cli": [["WildFi", 148940000, 295578549, 45, 58, 5274, 126250000, 39], ["SamyRoad | A Samy Alliance Agency", 114535000, 260833862, 14, 95, 10700, 113475000, 13], ["We are catch", 273959580, 251411124, 303, 196, 30380, 192830569, 262], ["Winclap", 0, 114000600, 0, 13, 0, 0, 0], ["Medialab", 173910027, 112440543, 80, 37, 0, 135206860, 65], ["FLUVIP - The Martech Group", 51444431, 101002000, 18, 21, 0, 51444431, 18], ["Sin cliente / agencia", 67275404, 91286134, 59, 49, 44413, 0, 0], ["Somos Fans", 32300000, 89436200, 13, 41, 34450, 30250000, 11], ["GrowMaxValue", 69079990, 88515980, 31, 24, 59374, 50523635, 25], ["The Crazy Entrepreneur", 0, 64474300, 0, 12, 44700, 0, 0], ["NINCH", 49753423, 64155000, 16, 107, 0, 48690000, 14], ["Green life", 0, 64127298, 0, 21, 45545, 0, 0], ["Happn", 0, 58462044, 0, 23, 39828, 0, 0], ["Room 23", 0, 45292000, 0, 159, 0, 0, 0], ["Iberogram", 2800000, 42525000, 1, 21, 0, 0, 0], ["Influsales", 484304911, 36513350, 15, 14, 0, 42989911, 12], ["love agency", 30300000, 36500000, 4, 3, 0, 30300000, 4], ["Bilbao group", 29890000, 36400000, 18, 18, 0, 29090000, 17], ["Marfrig", 0, 34478850, 0, 2, 23455, 0, 0], ["magistral", 2000000, 32272727, 1, 11, 0, 2000000, 1]], "mon": {"2025": [58119852, 75793240, 114035519, 186913256, 281511273, 147657259, 167823909, 190634104, 173250480, 221193563, 198283537, 676082990], "2026": [363873343, 159338872, 163087803, 248456236, 235746163, 307313994, 235852602, 190893500, 199114194, 323941808, 241040389, 0]}, "mond": {"2025": [20, 49, 67, 110, 157, 90, 103, 110, 98, 126, 126, 96], "2026": [110, 75, 114, 102, 147, 205, 119, 78, 128, 140, 104, 0]}, "tot": {"v25": 2491298319, "v26": 2668657616, "d25": 1152, "d26": 1322, "ytd25": 1723125523, "ytd25d": 996, "act": {"2025": {"t": 192, "c": 168, "m": 309}, "2026": {"t": 342, "c": 174, "m": 299}}, "wr": {"2025": [1203, 3040], "2026": [1309, 3625]}}};
+const MES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const G={base:'full',view:'resumen',mon:'m'};
+
+const fmtM=v=>{const a=Math.abs(v)/1e6;const s=a>=100?Math.round(a).toLocaleString('es-AR'):a.toFixed(1).replace('.',',');return (v<0?'−':'')+'$'+s+' M'};
+const fmtMs=v=>fmtM(v).replace(' M','M');
+const fmtN=v=>Math.round(v).toLocaleString('es-AR');
+const fmtP=v=>!isFinite(v)?'—':(v>0?'+':v<0?'−':'')+Math.abs(v*100).toFixed(1).replace('.',',')+'%';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cut=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
+const baseLbl=()=>G.base==='full'?'2025':'2025 al 17/11';
+
+// ---------- tooltip ----------
+const tip=document.getElementById('tip');
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e)}
+function moveTip(e){const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;
+  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.style.opacity=0}
+const row=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
+
+// ---------- entities ----------
+function mk(arr,kind){return arr.map(r=>{const [full,h]=r[0].split(' | ');return {n:kind==='tal'?full:r[0],h:kind==='tal'?h:'',key:r[0],
+  f25:r[1],v26:r[2],fd25:r[3],d26:r[4],usd26:r[5],y25:r[6],yd25:r[7],w26:r[8]||0,l26:r[9]||0}})}
+const ENT={
+  agencias:{kind:'ag',rows:mk(D.ag,'ag'),title:'Agencias con venta 2025 > ARS 10 M',unit:'agencias',one:'agencia',
+    universe:'Las 36 agencias que superaron ARS 10 M en 2025. No incluye clientes nuevos de 2026 (ver Resumen).',
+    st:{seg:'all',q:'',ex:false,sort:'b25',asc:false},exclude:'Influsales'},
+  talentos:{kind:'tal',rows:mk(D.tal,'tal'),title:'Top 40 talentos exclusivos por venta 2026',unit:'talentos',one:'talento',
+    universe:'Los 40 talentos exclusivos con mayor venta 2026. Al ser un ranking 2026, no muestra talentos que dejaron de vender.',
+    st:{seg:'all',q:'',ex:false,sort:'v26',asc:false}},
+};
+const SEG={up:['Crecen','Crece','b-up','var(--up)'],down:['Caen','Cae','b-down','var(--down)'],lost:['Sin venta 2026','Sin venta','b-lost','var(--down)'],new:['Nuevos vs base','Nuevo','b-new','var(--new)']};
+
+function derive(E){
+  return E.rows.map(d=>{const b25=G.base==='full'?d.f25:d.y25,bd25=G.base==='full'?d.fd25:d.yd25;
+    const seg=d.v26===0?'lost':b25===0?'new':d.v26>=b25?'up':'down';
+    return {...d,b25,bd25,dv:d.v26-b25,vp:b25?d.v26/b25-1:NaN,t25:bd25?b25/bd25:0,t26:d.d26?d.v26/d.d26:0,
+      wr:(d.w26+d.l26)?d.w26/(d.w26+d.l26):NaN,seg}})
+   .filter(d=>!(E.st.ex&&d.key===E.exclude));
+}
+function entTip(d,E){return `<b>${esc(d.n)}</b>${d.h?`<div style="color:var(--text-3);margin:-3px 0 4px">@${esc(d.h)}</div>`:''}`+
+  row('Venta '+baseLbl(),fmtM(d.b25))+row('Venta 2026',fmtM(d.v26))+row('Variación',`${fmtM(d.dv)} · ${fmtP(d.vp)}`)+
+  row('Deals '+baseLbl()+' → 2026',`${d.bd25} → ${d.d26}`)+row('Ticket',`${d.t25?fmtM(d.t25):'—'} → ${d.t26?fmtM(d.t26):'—'}`)+
+  (E.kind==='tal'&&isFinite(d.wr)?row('Tasa de cierre 2026',Math.round(d.wr*100)+'%'):'')+
+  (d.usd26?row('Facturado en USD 2026','US$ '+fmtN(d.usd26)):'')}
+
+function buildView(id){
+  const E=ENT[id],el=document.getElementById('v-'+id);
+  el.innerHTML=`
+  <p class="cap" style="margin:-4px 0 12px;color:var(--text-2)">${E.universe}</p>
+  <div class="controls">
+    <div class="seg" data-r="segs"></div>
+    ${E.exclude?`<label class="toggle"><input type="checkbox" data-r="ex"> Excluir ${E.exclude}</label>`:''}
+    <div class="spacer"></div>
+    <input type="search" data-r="q" placeholder="Buscar ${E.one}…">
+  </div>
+  <div class="kpis" data-r="kpis"></div>
+  <div class="grid2">
+    <div class="card"><h2>Puente de venta <span class="lg25">2025</span> → 2026</h2>
+      <p class="cap">De dónde viene la diferencia, por estado de cada ${E.one}.</p><svg data-r="bridge" width="100%" height="300"></svg></div>
+    <div class="card"><h2>Lectura rápida</h2><p class="cap">Se recalcula con los filtros.</p><ul class="insights" data-r="ins"></ul></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h2>Venta por ${E.one}</h2><p class="cap">Ordenado por venta 2026.</p>
+      <div class="legend"><span><i style="background:var(--s25)"></i><span class="lg25">2025</span></span><span><i style="background:var(--s26)"></i>2026 (al 17/11)</span></div>
+      <svg data-r="bars" width="100%"></svg></div>
+    <div class="card"><h2>Variación en ARS por ${E.one}</h2><p class="cap">De mayor crecimiento a mayor caída.</p>
+      <div class="legend"><span><i style="background:var(--up)"></i>Crece</span><span><i style="background:var(--down)"></i>Cae</span>${E.kind==='tal'?'<span><i style="background:var(--new)"></i>Nuevo</span>':''}</div>
+      <svg data-r="delta" width="100%"></svg></div>
+  </div>
+  <div class="card"><h2>Detalle por ${E.one}</h2><p class="cap">Click en un encabezado para ordenar. Ticket = venta ÷ deals.${E.kind==='tal'?' Tasa de cierre = ganados ÷ (ganados + perdidos) de deals creados en 2026.':''}</p>
+    <div class="tablewrap"><table data-r="tbl"><thead></thead><tbody></tbody></table></div></div>`;
+  const $=r=>el.querySelector(`[data-r="${r}"]`);
+  E.$=$;
+  $('q').oninput=e=>{E.st.q=e.target.value;renderEnt(id)};
+  if(E.exclude)$('ex').onchange=e=>{E.st.ex=e.target.checked;renderEnt(id)};
+}
+
+function renderEnt(id){
+  const E=ENT[id],$=E.$,all=derive(E),q=E.st.q.trim().toLowerCase();
+  // seg chips with counts
+  const cnt=k=>all.filter(d=>d.seg===k).length;
+  const segs=['up','down','lost','new'].filter(k=>cnt(k)>0);
+  if(E.st.seg!=='all'&&!segs.includes(E.st.seg))E.st.seg='all';
+  $('segs').innerHTML=`<button data-s="all" class="${E.st.seg==='all'?'on':''}">Todos<small>${all.length}</small></button>`+
+    segs.map(k=>`<button data-s="${k}" class="${E.st.seg===k?'on':''}">${SEG[k][0]}<small>${cnt(k)}</small></button>`).join('');
+  $('segs').querySelectorAll('button').forEach(b=>b.onclick=()=>{E.st.seg=b.dataset.s;renderEnt(id)});
+  const rows=all.filter(d=>(E.st.seg==='all'||d.seg===E.st.seg)&&(!q||(d.n+' '+d.h).toLowerCase().includes(q)));
+  const s=k=>rows.reduce((x,d)=>x+d[k],0);
+  const b25=s('b25'),v26=s('v26'),bd=s('bd25'),d26=s('d26'),w=s('w26'),l=s('l26');
+  const k=[
+    ['Venta '+baseLbl(),fmtM(b25),`${rows.length} ${E.unit}`],
+    ['Venta 2026 (al 17/11)',fmtM(v26),`<span class="${v26>=b25?'pos':'neg'}">${fmtP(v26/b25-1)}</span> · ${(v26-b25>=0?'+':'')+fmtM(v26-b25)}`],
+    ['Deals ganados',`${fmtN(bd)} → ${fmtN(d26)}`,`<span class="${d26>=bd?'pos':'neg'}">${fmtP(d26/bd-1)}</span>`],
+    ['Ticket promedio',`${bd?fmtM(b25/bd):'—'} → ${d26?fmtM(v26/d26):'—'}`,'venta ÷ deals'],
+    E.kind==='tal'?['Tasa de cierre 2026',(w+l)?Math.round(w/(w+l)*100)+'%':'—',`${fmtN(w)} ganados de ${fmtN(w+l)} cerrados`]
+      :['Cuentas por estado',`${cnt('up')} · ${cnt('down')} · ${cnt('lost')}`,'crecen · caen · sin venta 2026'],
+  ];
+  $('kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="lbl">${x[0]}</div><div class="val">${x[1]}</div><div class="det">${x[2]}</div></div>`).join('');
+  bridge($('bridge'),rows);
+  bars($('bars'),rows,E);
+  delta($('delta'),rows,E);
+  entInsights($('ins'),all,rows,E);
+  table($('tbl'),rows,E,id);
+}
+
+function bridge(svg,rows){
+  const W=svg.clientWidth||560,H=300,m={l:12,r:12,t:24,b:44};
+  const v25=rows.reduce((x,d)=>x+d.b25,0),v26=rows.reduce((x,d)=>x+d.v26,0);
+  const steps=[{k:'Venta '+baseLbl(),a:0,b:v25,c:'var(--s25)',tot:1}];let acc=v25;
+  ['up','new','down','lost'].forEach(sg=>{const g=rows.filter(d=>d.seg===sg);if(!g.length)return;const dv=g.reduce((x,d)=>x+d.dv,0);
+    steps.push({k:SEG[sg][0],a:acc,b:acc+dv,c:SEG[sg][3]});acc+=dv});
+  steps.push({k:'2026 al 17/11',a:0,b:v26,c:'var(--s26)',tot:1});
+  const max=Math.max(1,...steps.map(x=>Math.max(x.a,x.b)))*1.12,iw=W-m.l-m.r,ih=H-m.t-m.b,bw=iw/steps.length,y=v=>m.t+ih-(v/max)*ih;
+  let o='';for(let i=1;i<4;i++){const v=max*i/4;o+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/>`}
+  steps.forEach((x,i)=>{const x0=m.l+i*bw+bw*.18,w=bw*.64,top=y(Math.max(x.a,x.b)),h=Math.max(1,Math.abs(y(x.a)-y(x.b)));
+    o+=`<rect x="${x0}" y="${top}" width="${w}" height="${h}" rx="3" fill="${x.c}"/>`;
+    o+=`<text x="${x0+w/2}" y="${top-6}" text-anchor="middle" class="lab" font-weight="600">${x.tot?fmtM(x.b):(x.b-x.a>=0?'+':'')+fmtM(x.b-x.a)}</text>`;
+    o+=`<text x="${x0+w/2}" y="${H-m.b+18}" text-anchor="middle" class="lab2">${x.k}</text>`;
+    if(i<steps.length-1){const yy=y(x.b);o+=`<line x1="${x0+w}" x2="${x0+bw}" y1="${yy}" y2="${yy}" stroke="var(--text-3)" stroke-dasharray="2 3"/>`}});
+  o+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--border)"/>`;
+  svg.innerHTML=o;
+}
+
+function bindTips(svg,rows,E){svg.querySelectorAll('[data-i]').forEach(el=>{const d=rows[+el.dataset.i];
+  el.addEventListener('mousemove',e=>showTip(e,entTip(d,E)));el.addEventListener('mouseleave',hideTip)})}
+
+function bars(svg,rows,E){
+  const W=svg.clientWidth||560,lw=Math.min(170,W*.32),rh=26,m={t:6,r:58,b:22};
+  const r=[...rows].sort((a,b)=>b.v26-a.v26),H=m.t+m.b+r.length*rh;svg.setAttribute('height',Math.max(H,60));
+  const max=Math.max(1,...r.map(d=>Math.max(d.b25,d.v26))),iw=W-lw-m.r,x=v=>lw+(v/max)*iw;
+  let o='';for(let i=0;i<=4;i++){const v=max*i/4,xx=x(v);o+=`<line x1="${xx}" x2="${xx}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><text class="ax" x="${xx}" y="${H-6}" text-anchor="middle">${fmtMs(v)}</text>`}
+  r.forEach((d,i)=>{const y0=m.t+i*rh;
+    o+=`<text x="${lw-8}" y="${y0+rh/2+4}" text-anchor="end" class="lab">${esc(cut(d.n,24))}</text>`;
+    o+=`<rect x="${lw}" y="${y0+4}" width="${Math.max(0,x(d.b25)-lw)}" height="8" rx="2" fill="var(--s25)"/>`;
+    o+=`<rect x="${lw}" y="${y0+14}" width="${Math.max(0,x(d.v26)-lw)}" height="8" rx="2" fill="var(--s26)"/>`;
+    o+=`<text x="${Math.max(x(d.b25),x(d.v26))+6}" y="${y0+rh/2+4}" class="lab2">${d.seg==='new'?'nuevo':fmtP(d.vp)}</text>`;
+    o+=`<rect class="hit" data-i="${i}" x="0" y="${y0}" width="${W}" height="${rh}"/>`});
+  if(!r.length)o+=`<text x="${W/2}" y="34" text-anchor="middle" class="lab2">Sin resultados para este filtro</text>`;
+  svg.innerHTML=o;bindTips(svg,r,E);
+}
+
+function delta(svg,rows,E){
+  const W=svg.clientWidth||560,lw=Math.min(170,W*.32),rh=26,m={t:6,r:12,b:22};
+  const r=[...rows].sort((a,b)=>b.dv-a.dv),H=m.t+m.b+r.length*rh;svg.setAttribute('height',Math.max(H,60));
+  const lo=Math.min(0,...r.map(d=>d.dv)),hi=Math.max(0,...r.map(d=>d.dv)),pad=70,iw=W-lw-m.r-pad*2,x=v=>lw+pad+((v-lo)/((hi-lo)||1))*iw,x0=x(0);
+  let o='';[lo,lo/2,0,hi/2,hi].filter((v,i,a)=>a.indexOf(v)===i&&(v===0||Math.abs(x(v)-x0)>48)).forEach(v=>{const xx=x(v);
+    o+=`<line x1="${xx}" x2="${xx}" y1="${m.t}" y2="${H-m.b}" stroke="${v===0?'var(--text-3)':'var(--grid)'}"/><text class="ax" x="${xx}" y="${H-6}" text-anchor="middle">${fmtMs(v)}</text>`});
+  r.forEach((d,i)=>{const y0=m.t+i*rh,xv=x(d.dv),a=Math.min(x0,xv),w=Math.max(1,Math.abs(xv-x0));
+    o+=`<text x="${lw-8}" y="${y0+rh/2+4}" text-anchor="end" class="lab">${esc(cut(d.n,24))}</text>`;
+    o+=`<rect x="${a}" y="${y0+6}" width="${w}" height="${rh-12}" rx="3" fill="${d.seg==='new'?'var(--new)':d.dv>=0?'var(--up)':'var(--down)'}"/>`;
+    o+=`<text x="${d.dv>=0?xv+6:xv-6}" y="${y0+rh/2+4}" text-anchor="${d.dv>=0?'start':'end'}" class="lab2">${(d.dv>=0?'+':'')+fmtM(d.dv)}</text>`;
+    o+=`<rect class="hit" data-i="${i}" x="0" y="${y0}" width="${W}" height="${rh}"/>`});
+  if(!r.length)o+=`<text x="${W/2}" y="34" text-anchor="middle" class="lab2">Sin resultados para este filtro</text>`;
+  svg.innerHTML=o;bindTips(svg,r,E);
+}
+
+function entInsights(ul,all,rows,E){
+  if(!rows.length){ul.innerHTML='<li>Sin resultados para este filtro.</li>';return}
+  const t25=rows.reduce((x,d)=>x+d.b25,0),t26=rows.reduce((x,d)=>x+d.v26,0),out=[];
+  const worst=[...rows].sort((a,b)=>a.dv-b.dv)[0],best=[...rows].sort((a,b)=>b.dv-a.dv)[0];
+  if(best.dv>0)out.push(`<b>Mayor crecimiento: ${esc(best.n)}</b> (+${fmtM(best.dv)}${best.seg==='new'?', nuevo':', '+fmtP(best.vp)}).`);
+  if(worst.dv<0)out.push(`<b>Mayor caída: ${esc(worst.n)}</b> (${fmtM(worst.dv)}, ${fmtP(worst.vp)}).`+(t26<t25?` <span>Explica el ${Math.round(worst.dv/(t26-t25)*100)}% de la caída neta.</span>`:''));
+  const filt=E.st.seg==='all'&&!E.st.q;
+  if(E.kind==='ag'){
+    const inf=all.find(d=>d.key==='Influsales');
+    if(inf&&filt){const a25=t25-inf.b25,a26=t26-inf.v26;out.push(`<b>Sin Influsales: ${fmtP(a26/a25-1)}</b> <span>(${fmtM(a25)} → ${fmtM(a26)}).</span>`)}
+    if(inf&&G.base==='full')out.push(`<b>Influsales cerró ${fmtM(inf.f25-inf.y25)} después del 17/11/2025.</b> <span>Contra el mismo período su caída es ${fmtP(inf.v26/inf.y25-1)}, no −92,5%.</span>`);
+    const lost=rows.filter(d=>d.seg==='lost');
+    if(lost.length)out.push(`<b>${lost.length} cuentas sin compras en 2026</b> <span>que sumaban ${fmtM(lost.reduce((x,d)=>x+d.b25,0))} (${esc(lost.sort((a,b)=>b.b25-a.b25).slice(0,3).map(d=>d.n).join(', '))}…). Foco de reactivación.</span>`);
+  }else{
+    const nw=rows.filter(d=>d.seg==='new');
+    if(nw.length)out.push(`<b>${nw.length} talentos sin venta en la base</b> <span>aportan ${fmtM(nw.reduce((x,d)=>x+d.v26,0))} en 2026 (${esc(nw.sort((a,b)=>b.v26-a.v26).slice(0,3).map(d=>d.n).join(', '))}…).</span>`);
+    const up=rows.filter(d=>d.seg==='up').length,dn=rows.filter(d=>d.seg==='down').length;
+    out.push(`<b>${up} crecen y ${dn} caen</b> <span>contra ${baseLbl()}.</span>`);
+    const wr=rows.filter(d=>(d.w26+d.l26)>=15).sort((a,b)=>b.wr-a.wr);
+    if(wr.length>=4)out.push(`<b>Mejor tasa de cierre:</b> <span>${esc(wr.slice(0,2).map(d=>`${d.n} (${Math.round(d.wr*100)}%)`).join(', '))}. Más baja: ${esc(wr.slice(-2).map(d=>`${d.n} (${Math.round(d.wr*100)}%)`).join(', '))}. Talentos con 15+ deals cerrados.</span>`);
+  }
+  const sorted=[...rows].sort((a,b)=>b.v26-a.v26),t5=sorted.slice(0,5).reduce((x,d)=>x+d.v26,0);
+  if(t26>0&&rows.length>5)out.push(`<b>Concentración:</b> <span>los 5 primeros explican el ${Math.round(t5/t26*100)}% de la venta 2026 del grupo.</span>`);
+  const vol=rows.filter(d=>d.bd25&&d.d26>d.bd25*2&&d.d26>=20&&d.t26<d.t25);
+  if(vol.length)out.push(`<b>Más volumen, menor ticket:</b> <span>${esc(vol.slice(0,3).map(d=>`${d.n} (${d.bd25}→${d.d26} deals, ticket ${fmtM(d.t25)}→${fmtM(d.t26)})`).join('; '))}.</span>`);
+  ul.innerHTML=out.map(x=>`<li>${x}</li>`).join('');
+}
+
+function table(t,rows,E,id){
+  const COLS=[
+    ['n',E.kind==='tal'?'Talento':'Agencia',d=>esc(d.n)+(d.h?`<small>@${esc(d.h)}</small>`:'')],
+    ['seg','Estado',d=>`<span class="badge ${SEG[d.seg][2]}">${SEG[d.seg][1]}</span>`],
+    ['b25','Venta '+baseLbl(),d=>fmtM(d.b25)],
+    ['v26','Venta 2026',d=>fmtM(d.v26)],
+    ['dv','Var. ARS',d=>`<span class="${d.dv>=0?'pos':'neg'}">${(d.dv>=0?'+':'')+fmtM(d.dv)}</span>`],
+    ['vp','Var. %',d=>isFinite(d.vp)?`<span class="${d.vp>=0?'pos':'neg'}">${fmtP(d.vp)}</span>`:'—'],
+    ['bd25','Deals 25',d=>d.bd25],
+    ['d26','Deals 26',d=>d.d26],
+    ['t25','Ticket 25',d=>d.t25?fmtM(d.t25):'—'],
+    ['t26','Ticket 26',d=>d.t26?fmtM(d.t26):'—'],
+    ...(E.kind==='tal'?[['wr','Cierre 26',d=>isFinite(d.wr)?Math.round(d.wr*100)+'%':'—']]:[]),
+    ['usd26','USD 2026',d=>d.usd26?'US$ '+fmtN(d.usd26):'—'],
+  ];
+  const st=E.st;
+  t.tHead.innerHTML='<tr>'+COLS.map(c=>`<th data-k="${c[0]}" class="${st.sort===c[0]?'sorted'+(st.asc?' asc':''):''}">${c[1]}</th>`).join('')+'</tr>';
+  const r=[...rows].sort((a,b)=>{let x=a[st.sort],y=b[st.sort];if(typeof x==='string')return st.asc?x.localeCompare(y):y.localeCompare(x);
+    x=isFinite(x)?x:-1e18;y=isFinite(y)?y:-1e18;return st.asc?x-y:y-x});
+  const s=k=>rows.reduce((x,d)=>x+d[k],0),b25=s('b25'),v26=s('v26');
+  const tot=rows.length?`<tr style="font-weight:600"><td>Total (${rows.length})</td><td></td><td>${fmtM(b25)}</td><td>${fmtM(v26)}</td><td>${(v26-b25>=0?'+':'')+fmtM(v26-b25)}</td><td>${fmtP(v26/b25-1)}</td><td>${fmtN(s('bd25'))}</td><td>${fmtN(s('d26'))}</td><td></td><td></td>${E.kind==='tal'?`<td>${(s('w26')+s('l26'))?Math.round(s('w26')/(s('w26')+s('l26'))*100)+'%':'—'}</td>`:''}<td>US$ ${fmtN(s('usd26'))}</td></tr>`:'';
+  t.tBodies[0].innerHTML=r.map(d=>'<tr>'+COLS.map(c=>`<td>${c[2](d)}</td>`).join('')+'</tr>').join('')+tot;
+  t.tHead.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(st.sort===k)st.asc=!st.asc;else{st.sort=k;st.asc=k==='n'}renderEnt(id)});
+}
+
+// ---------- resumen ----------
+function renderResumen(){
+  const T=D.tot,b25=G.base==='full'?T.v25:T.ytd25,bd=G.base==='full'?T.d25:T.ytd25d;
+  const wr=y=>T.wr[y][0]/(T.wr[y][0]+T.wr[y][1]);
+  const k=[
+    ['Venta ganada '+baseLbl(),fmtM(b25),`${fmtN(bd)} deals`],
+    ['Venta ganada 2026 (al 17/11)',fmtM(T.v26),`<span class="${T.v26>=b25?'pos':'neg'}">${fmtP(T.v26/b25-1)}</span> · ${(T.v26-b25>=0?'+':'')+fmtM(T.v26-b25)}`],
+    ['Deals ganados',`${fmtN(bd)} → ${fmtN(T.d26)}`,`<span class="${T.d26>=bd?'pos':'neg'}">${fmtP(T.d26/bd-1)}</span>`],
+    ['Ticket promedio',`${fmtM(b25/bd)} → ${fmtM(T.v26/T.d26)}`,'venta ÷ deals'],
+    ['Talentos con venta',`${T.act['2025'].t} → ${T.act['2026'].t}`,'año 2025 completo vs 2026'],
+    ['Clientes / agencias con venta',`${T.act['2025'].c} → ${T.act['2026'].c}`,'año 2025 completo vs 2026'],
+    ['Tasa de cierre',`${Math.round(wr('2025')*100)}% → ${Math.round(wr('2026')*100)}%`,'deals creados en cada año'],
+  ];
+  document.getElementById('r-kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="lbl">${x[0]}</div><div class="val">${x[1]}</div><div class="det">${x[2]}</div></div>`).join('');
+  monthly();clients();
+  const dec=D.mon['2025'][11],ag=ENT.agencias.rows,inf=ag.find(d=>d.key==='Influsales');
+  const cl=D.cli.filter(c=>c[1]===0&&c[0]!=='Sin cliente / agencia');
+  const agv26=ag.reduce((x,d)=>x+d.v26,0);
+  const ins=[
+    `<b>Mismo período: ${fmtP(T.v26/T.ytd25-1)}.</b> <span>Al 17/11, 2026 suma ${fmtM(T.v26)} contra ${fmtM(T.ytd25)} en 2025. Contra el año 2025 completo la suba es ${fmtP(T.v26/T.v25-1)}.</span>`,
+    `<b>Diciembre 2025 fue el mes más fuerte:</b> <span>${fmtM(dec)}, el ${Math.round(dec/T.v25*100)}% del año. De eso, ${fmtM(inf.f25-inf.y25)} corresponden a Influsales.</span>`,
+    `<b>El crecimiento viene por amplitud:</b> <span>los talentos con venta pasaron de ${T.act['2025'].t} a ${T.act['2026'].t}, con una cantidad de clientes estable (${T.act['2025'].c} → ${T.act['2026'].c}).</span>`,
+    `<b>${cl.length} de los top 20 clientes 2026 son nuevos</b> <span>y suman ${fmtM(cl.reduce((x,c)=>x+c[2],0))} (${esc(cl.slice(0,3).map(c=>c[0]).join(', '))}…).</span>`,
+    `<b>Dependencia de cartera 2025:</b> <span>las 36 agencias grandes de 2025 explican el ${Math.round(agv26/T.v26*100)}% de la venta 2026, el resto viene de cuentas más chicas o nuevas.</span>`,
+    `<b>Tasa de cierre:</b> <span>${Math.round(wr('2025')*100)}% en 2025 vs ${Math.round(wr('2026')*100)}% en 2026; se cierran más deals sobre un volumen mayor de propuestas.</span>`,
+  ];
+  document.getElementById('r-ins').innerHTML=ins.map(x=>`<li>${x}</li>`).join('');
+}
+function monthly(){
+  const svg=document.getElementById('r-mon'),W=svg.clientWidth||700,H=280,m={l:56,r:16,t:14,b:28};
+  const a=D.mon['2025'].slice(),b=D.mon['2026'].slice(0,11);
+  const cum=arr=>arr.reduce((o,v,i)=>(o.push((o[i-1]||0)+v),o),[]);
+  const A=G.mon==='c'?cum(a):a,B=G.mon==='c'?cum(b):b;
+  const max=Math.max(...A,...B)*1.1,iw=W-m.l-m.r,ih=H-m.t-m.b,x=i=>m.l+iw*(i+.5)/12,y=v=>m.t+ih-(v/max)*ih;
+  let o='';for(let i=0;i<=4;i++){const v=max*i/4;o+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="${i?'var(--grid)':'var(--border)'}"/><text class="ax" x="${m.l-8}" y="${y(v)+4}" text-anchor="end">${fmtMs(v)}</text>`}
+  MES.forEach((t,i)=>o+=`<text class="ax" x="${x(i)}" y="${H-8}" text-anchor="middle">${t}</text>`);
+  const path=(arr,c)=>`<path d="${arr.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join('')}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`+
+    arr.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${c}" stroke="var(--surface)" stroke-width="2"/>`).join('');
+  o+=path(A,'var(--s25)')+path(B,'var(--s26)');
+  o+=`<text class="lab2" x="${x(10)+8}" y="${y(B[10])-8}">al 17/11</text>`;
+  o+=`<line id="xh" x1="0" x2="0" y1="${m.t}" y2="${H-m.b}" stroke="var(--text-3)" stroke-dasharray="2 3" opacity="0"/>`;
+  for(let i=0;i<12;i++)o+=`<rect class="hit" data-m="${i}" x="${m.l+iw*i/12}" y="${m.t}" width="${iw/12}" height="${ih}"/>`;
+  svg.innerHTML=o;const xh=svg.querySelector('#xh');
+  svg.querySelectorAll('[data-m]').forEach(el=>{const i=+el.dataset.m;
+    el.addEventListener('mousemove',e=>{xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));xh.setAttribute('opacity',1);
+      const lab=G.mon==='c'?'acumulado a ':'';
+      showTip(e,`<b>${MES[i]}${G.mon==='c'?' (acumulado)':''}</b>`+row('2025',fmtM(A[i])+` · ${D.mond['2025'][i]} deals`)+
+        (i<11?row('2026'+(i===10?' (al 17/11)':''),fmtM(B[i])+` · ${D.mond['2026'][i]} deals`)+row('Variación',fmtP(B[i]/A[i]-1)):row('2026','—')))});
+    el.addEventListener('mouseleave',()=>{hideTip();xh.setAttribute('opacity',0)})});
+}
+function clients(){
+  const svg=document.getElementById('r-cli'),W=svg.clientWidth||1100,lw=Math.min(220,W*.25),rh=24,m={t:6,r:140,b:22};
+  const r=D.cli.map(c=>{const b=G.base==='full'?c[1]:c[6];return {n:c[0],b,v:c[2],bd:G.base==='full'?c[3]:c[7],d:c[4],usd:c[5],isNew:b===0}});
+  const H=m.t+m.b+r.length*rh;svg.setAttribute('height',H);
+  const max=Math.max(...r.map(d=>Math.max(d.b,d.v))),iw=W-lw-m.r,x=v=>lw+(v/max)*iw;
+  let o='';for(let i=0;i<=4;i++){const v=max*i/4,xx=x(v);o+=`<line x1="${xx}" x2="${xx}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><text class="ax" x="${xx}" y="${H-6}" text-anchor="middle">${fmtMs(v)}</text>`}
+  r.forEach((d,i)=>{const y0=m.t+i*rh;
+    o+=`<text x="${lw-8}" y="${y0+rh/2+4}" text-anchor="end" class="lab">${esc(cut(d.n,30))}</text>`;
+    o+=`<rect x="${lw}" y="${y0+4}" width="${Math.max(0,x(d.b)-lw)}" height="7" rx="2" fill="var(--s25)"/>`;
+    o+=`<rect x="${lw}" y="${y0+13}" width="${Math.max(0,x(d.v)-lw)}" height="7" rx="2" fill="${d.isNew?'var(--new)':'var(--s26)'}"/>`;
+    o+=`<text x="${Math.max(x(d.b),x(d.v))+6}" y="${y0+rh/2+4}" class="lab2">${fmtM(d.v)} · ${d.isNew?'nuevo':fmtP(d.v/d.b-1)}</text>`;
+    o+=`<rect class="hit" data-i="${i}" x="0" y="${y0}" width="${W}" height="${rh}"/>`});
+  svg.innerHTML=o;
+  svg.querySelectorAll('[data-i]').forEach(el=>{const d=r[+el.dataset.i];
+    el.addEventListener('mousemove',e=>showTip(e,`<b>${esc(d.n)}</b>`+row('Venta '+baseLbl(),fmtM(d.b))+row('Venta 2026',fmtM(d.v))+row('Variación',d.isNew?'cliente nuevo':fmtP(d.v/d.b-1))+row('Deals',`${d.bd} → ${d.d}`)+(d.usd?row('Facturado en USD 2026','US$ '+fmtN(d.usd)):'')));
+    el.addEventListener('mouseleave',hideTip)});
+}
+
+// ---------- routing & global ----------
+function render(){
+  document.querySelectorAll('.lg25').forEach(e=>e.textContent=baseLbl());
+  document.getElementById('baseNote').innerHTML=G.base==='full'
+    ?'<b>Comparando contra 2025 completo:</b> 2026 llega solo hasta el 17/11, así que esta vista subestima 2026 (le faltan ~6 semanas, incluido diciembre). Para una comparación pareja elegí “2025 al 17/11”.'
+    :'<b>Comparando el mismo período:</b> 1/1 al 17/11 de cada año. Es la comparación pareja; los valores 2025 se recalcularon desde el detalle de deals con el mismo tipo de cambio mensual.';
+  if(G.view==='resumen')renderResumen();else renderEnt(G.view);
+}
+function route(){const h=location.hash.slice(1);G.view=['resumen','agencias','talentos'].includes(h)?h:'resumen';
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+G.view));
+  document.querySelectorAll('#tabs a').forEach(a=>a.classList.toggle('on',a.dataset.v===G.view));render()}
+buildView('agencias');buildView('talentos');
+document.querySelectorAll('#baseSel button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#baseSel button').forEach(x=>x.classList.remove('on'));b.classList.add('on');G.base=b.dataset.b;render()});
+document.querySelectorAll('#monMode button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#monMode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');G.mon=b.dataset.m;monthly()});
+addEventListener('hashchange',route);
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(render,120)});
+route();
+</script>
+</body>
+</html>
